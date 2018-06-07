@@ -49,6 +49,7 @@ dependencies {
     compile 'org.apache.lucene:lucene-facet:5.3.0'
     compile 'org.apache.lucene:lucene-queryparser:5.3.0'
     compile 'org.apache.lucene:lucene-expressions:5.3.0'
+    compile 'org.apache.commons:commons-lang3:3.0'
 
     compile 'net.sf.opencsv:opencsv:2.3'
 

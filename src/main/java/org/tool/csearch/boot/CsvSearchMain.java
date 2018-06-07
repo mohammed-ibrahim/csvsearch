@@ -11,6 +11,7 @@ public class CsvSearchMain {
             throw new RuntimeException("Needs 1 parameter to run..");
         }
 
-        new Indexer().index(Paths.get(args[0]));
+        Indexer indexer = new Indexer(Paths.get(args[0]));
+        new Communicator().start(indexer.getDropPath(), indexer.getHeaders());
     }
 }

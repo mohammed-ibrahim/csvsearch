@@ -18,18 +18,26 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.FSDirectory;
 
 import au.com.bytecode.opencsv.CSVReader;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Data
 public class Indexer {
 
-    public void index(Path filePath) throws Exception {
+    private Path dropPath;
+
+    private List<String> headers;
+
+    public Indexer(Path filePath) throws Exception {
+        index(filePath);
+    }
+
+    private Path index(Path filePath) throws Exception {
 
         String uuid = UUID.randomUUID().toString().replace("-", "");
-//        Path dropPath = Paths.get(System.getProperty("java.io.tmpdir"), uuid);
-        Path dropPath = Paths.get("/tmp", uuid);
-        
-        
+//        dropPath = Paths.get(System.getProperty("java.io.tmpdir"), uuid);
+        dropPath = Paths.get("/tmp", uuid);
 
         log.info("Dropping to locations: {}", dropPath);
 
@@ -43,8 +51,8 @@ public class Indexer {
                 IndexWriter indexWriter = new IndexWriter(indexDir, indexWriterConfig)) {
 
             String[] line = reader.readNext();
-            List<String> headers = Arrays.asList(line);
-            int numColumns = headers.size();
+            this.headers = Arrays.asList(line);
+            int numColumns = this.headers.size();
 
             while ((line = reader.readNext()) != null) {
                 Document document = new Document();
@@ -68,6 +76,7 @@ public class Indexer {
             }
 
             log.info("Indexed all documents to: {}", dropPath);
+            return dropPath;
         }
     }
 }
