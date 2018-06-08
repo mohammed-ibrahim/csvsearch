@@ -1,11 +1,12 @@
 package org.tool.csearch.boot;
 
 import java.io.FileReader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -25,19 +26,13 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 public class Indexer {
 
-    private Path dropPath;
-
     private List<String> headers;
 
-    public Indexer(Path filePath) throws Exception {
-        index(filePath);
+    public Indexer(Path filePath, Path dropPath) throws Exception {
+        index(filePath, dropPath);
     }
 
-    private Path index(Path filePath) throws Exception {
-
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-//        dropPath = Paths.get(System.getProperty("java.io.tmpdir"), uuid);
-        dropPath = Paths.get("/tmp", uuid);
+    private Path index(Path filePath, Path dropPath) throws Exception {
 
         log.info("Dropping to locations: {}", dropPath);
 
@@ -74,6 +69,9 @@ public class Indexer {
                     log.info("Added document: {}", numDocuments);
                 }
             }
+
+            Path waterMarkFile = Paths.get(dropPath.toString(), Constants.WATER_MARK_FILE);
+            Files.write(waterMarkFile, Arrays.asList(Constants.WATER_MARK_FILE_CONTENT), Charset.forName("UTF-8"));
 
             log.info("Indexed all documents to: {}", dropPath);
             return dropPath;
