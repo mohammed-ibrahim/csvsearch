@@ -1,4 +1,4 @@
-package org.tool.csearch.boot;
+package org.tool.csearch.indexer;
 
 import java.io.FileReader;
 import java.nio.charset.Charset;
@@ -19,6 +19,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.FSDirectory;
+import org.tool.csearch.common.Constants;
+import org.tool.csearch.common.Timer;
 
 import au.com.bytecode.opencsv.CSVReader;
 import lombok.Data;
@@ -36,7 +38,8 @@ public class Indexer {
 
     private Path index(Path filePath, Path dropPath) throws Exception {
 
-        log.info("Dropping to locations: {}", dropPath);
+        log.info("Indexing........");
+        Timer timer = new Timer();
 
         FSDirectory indexDir = FSDirectory.open(dropPath);
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(new StandardAnalyzer())
@@ -61,8 +64,8 @@ public class Indexer {
                     FieldType stringFieldType = new FieldType(StringField.TYPE_STORED);
                     stringFieldType.setOmitNorms(false);
 //                    Field stringField = new Field(headers.get(i), value, stringFieldType);
-                    Field stringField = new TextField(headers.get(i), value, Store.YES);
-                    document.add(stringField);
+                    Field textField = new TextField(headers.get(i), value, Store.YES);
+                    document.add(textField);
                 }
 
                 indexWriter.addDocument(document);
@@ -76,7 +79,7 @@ public class Indexer {
             Path waterMarkFile = Paths.get(dropPath.toString(), Constants.WATER_MARK_FILE);
             Files.write(waterMarkFile, Arrays.asList(Constants.WATER_MARK_FILE_CONTENT), Charset.forName("UTF-8"));
 
-            log.info("Indexed all documents to: {}", dropPath);
+            log.info("Documents indexed: {} Time taken: {}, location: {}", numDocuments, timer.end().toString(), dropPath);
             return dropPath;
         }
     }

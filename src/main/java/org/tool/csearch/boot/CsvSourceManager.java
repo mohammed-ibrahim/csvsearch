@@ -8,6 +8,8 @@ import java.nio.file.Paths;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
+import org.tool.csearch.common.Constants;
+import org.tool.csearch.common.Timer;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ public class CsvSourceManager {
         this.indexingRequired = true;
 
         String md5File = getMd5OfFileContents(filePath);
+
         String md5Name = DigestUtils.md5Hex(filePath.toAbsolutePath().toString());
 
         String baseDir = "";
@@ -32,6 +35,8 @@ public class CsvSourceManager {
         dropPath = Paths.get(baseDir, "csvsearch", md5Name, md5File);
 
         Path waterMarkFile = Paths.get(dropPath.toString(), Constants.WATER_MARK_FILE);
+
+        Timer t2 = new Timer();
 
         if (!waterMarkFile.toFile().isFile()
                 || !Constants.WATER_MARK_FILE_EXPECTED_MD5.equals(getMd5OfFileContents(waterMarkFile))) {
@@ -52,15 +57,16 @@ public class CsvSourceManager {
 
         } else {
 
-//            String foundMd5 = getMd5OfFileContents(waterMarkFile);
-//            log.info("Found md5: {}", foundMd5);
             this.indexingRequired = false;
         }
+
+        log.info("T2 block timer: {}", t2.end().toString());
     }
 
     private String getMd5OfFileContents(Path filePath) throws Exception {
 
         String md5;
+        Timer timer = new Timer();
 
         try (FileInputStream fis = new FileInputStream(filePath.toFile())) {
 
@@ -68,6 +74,7 @@ public class CsvSourceManager {
 
         }
 
+        log.info("Time taken to compute hash: {}", timer.end().toString());
         return md5;
     }
 

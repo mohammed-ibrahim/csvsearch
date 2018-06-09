@@ -1,4 +1,4 @@
-package org.tool.csearch.boot;
+package org.tool.csearch.search;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

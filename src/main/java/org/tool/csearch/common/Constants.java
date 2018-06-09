@@ -1,4 +1,4 @@
-package org.tool.csearch.boot;
+package org.tool.csearch.common;
 
 public class Constants {
 
