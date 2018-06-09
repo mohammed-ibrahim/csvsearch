@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.tool.csearch.common.AppConfig;
 import org.tool.csearch.common.CsvColumnAnalyzer;
 import org.tool.csearch.common.Timer;
 import org.tool.csearch.factory.FormatterFactory;
@@ -20,55 +21,39 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CsvSearchMain {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] argsv) throws Exception {
 
+        AppConfig appConfig = new AppConfig(argsv);
         /*
          * TODO:
          * 1. Timer
          * 2. Limit in input
          * 3. Package refactor - done
          */
-        if (args.length < 2) {
 
-            //usage: java -jar cs.jar inputcsv.csv lucene_query [list_of_columns] [table|vtable|simple]
-            throw new RuntimeException("usage: java -jar cs.jar inputcsv.csv lucene_query [list_of_columns] [table|vtable|simple]");
-        }
-
-        Path inputCsvFilePath = Paths.get(args[0]);
-        String columnExpression = (args.length > 2 ? args[2] : null);
         CsvColumnAnalyzer csvColumnAnalyzer = new CsvColumnAnalyzer();
-        csvColumnAnalyzer.compile(inputCsvFilePath, columnExpression);
-
-        String formatterName = "simple";
-
-        if (args.length > 3) {
-            List<String> allowedFormatters = Arrays.asList("table", "vtable", "simple");
-
-            String requestedFormat = args[3];
-            if (!allowedFormatters.contains(requestedFormat)) {
-
-                throw new RuntimeException("Only allowed formats are: " + StringUtils.join(allowedFormatters));
-            }
-
-            formatterName = requestedFormat;
-        }
+        csvColumnAnalyzer.compile(appConfig.getInputCsvFilePath(), appConfig.getColumnExpression());
 
         Timer srcMgrTimer = new Timer();
-        CsvSourceManager csvSourceManager = new CsvSourceManager(inputCsvFilePath);
+        CsvSourceManager csvSourceManager = new CsvSourceManager(appConfig.getInputCsvFilePath());
         log.info("Timer taken to index/validate: {}", srcMgrTimer.end().toString());
 
         if (csvSourceManager.getIndexingRequired()) {
 
             log.info("Creating new index...");
-            new Indexer(inputCsvFilePath, csvSourceManager.getDropPath());
+            new Indexer(appConfig.getInputCsvFilePath(), csvSourceManager.getDropPath());
         } else {
 
             log.info("Reusing existing index: {}", csvSourceManager.getDropPath());
         }
 
-        IFormatter formatter = new FormatterFactory().getFormatter(formatterName);
+        IFormatter formatter = new FormatterFactory().getFormatter(appConfig.getFormatterName());
         IndexSearchDelegator searchDelegator = new IndexSearchDelegator();
-        searchDelegator.search(args[1], csvSourceManager.getDropPath(), formatter, csvColumnAnalyzer.getSelectedColumnNames());
+        searchDelegator.search(appConfig.getLuceneQuery(),
+                csvSourceManager.getDropPath(),
+                formatter,
+                csvColumnAnalyzer.getSelectedColumnNames(),
+                appConfig.getLimit());
     }
 
     public static List<String> getColumnNamesOfCsv(Path path) {

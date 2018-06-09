@@ -18,15 +18,19 @@ import org.tool.csearch.log.Logger;
 
 public class IndexSearchDelegator {
 
-    public void search(String luceneQuery, Path path, IFormatter formatter, List<String> headers) throws Exception {
+    public void search(String luceneQuery,
+            Path path,
+            IFormatter formatter,
+            List<String> headers,
+            int limit) throws Exception {
+
         try (IndexReader reader = DirectoryReader.open(FSDirectory.open(path))) {
             IndexSearcher searcher = new IndexSearcher(reader);
 
-            int maxDocs = 100;
             Query query = new QueryParser(headers.get(0), new StandardAnalyzer()).parse(luceneQuery);
             Logger.debug(query.toString());
             Timer searchTimer = new Timer();
-            TopDocs topDocs = searcher.search(query, maxDocs);
+            TopDocs topDocs = searcher.search(query, limit);
             Logger.debug(String.format("Time taken to perform query: %s", searchTimer.end().toString()));
 
             Timer fetchTimer = new Timer();
