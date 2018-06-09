@@ -2,9 +2,9 @@ package org.tool.csearch.boot;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.InetAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -82,12 +82,19 @@ public class CsvSourceManager {
 
         try {
 
-            InetAddress addr = InetAddress.getLocalHost();
-            String hostname = addr.getHostName();
-            if (hostname.toLowerCase().indexOf("macbook") > -1) {
+            String os = System.getProperty("os.name").toLowerCase();
 
+            if (os.indexOf("mac") >= 0) {
                 return true;
             }
+
+//            InetAddress addr = InetAddress.getLocalHost();
+//            String hostname = addr.getHostName();
+//            String hostname = getComputerName();
+//            if (hostname.toLowerCase().indexOf("macbook") > -1) {
+//
+//                return true;
+//            }
 
         } catch (Exception e) {
 

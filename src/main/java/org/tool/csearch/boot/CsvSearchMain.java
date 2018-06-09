@@ -26,9 +26,7 @@ public class CsvSearchMain {
         AppConfig appConfig = new AppConfig(argsv);
         /*
          * TODO:
-         * 1. Timer
-         * 2. Limit in input
-         * 3. Package refactor - done
+         * 1. Fix logging.
          */
 
         CsvColumnAnalyzer csvColumnAnalyzer = new CsvColumnAnalyzer();
