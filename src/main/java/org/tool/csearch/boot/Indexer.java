@@ -11,8 +11,10 @@ import java.util.List;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
@@ -58,7 +60,8 @@ public class Indexer {
 
                     FieldType stringFieldType = new FieldType(StringField.TYPE_STORED);
                     stringFieldType.setOmitNorms(false);
-                    Field stringField = new Field(headers.get(i), value, stringFieldType);
+//                    Field stringField = new Field(headers.get(i), value, stringFieldType);
+                    Field stringField = new TextField(headers.get(i), value, Store.YES);
                     document.add(stringField);
                 }
 

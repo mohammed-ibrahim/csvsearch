@@ -29,7 +29,7 @@ public class CsvSearchMain {
             new Indexer(inputCsvFilePath, csvSourceManager.getDropPath());
         } else {
 
-            log.info("Reusing existing index...");
+            log.info("Reusing existing index: {}", csvSourceManager.getDropPath());
         }
 
         new Communicator().start(csvSourceManager.getDropPath(), headers);

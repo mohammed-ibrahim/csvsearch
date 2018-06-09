@@ -33,7 +33,8 @@ public class CsvSourceManager {
 
         Path waterMarkFile = Paths.get(dropPath.toString(), Constants.WATER_MARK_FILE);
 
-        if (!waterMarkFile.toFile().isFile()) {
+        if (!waterMarkFile.toFile().isFile()
+                || !Constants.WATER_MARK_FILE_EXPECTED_MD5.equals(getMd5OfFileContents(waterMarkFile))) {
 
             try {
 
@@ -48,8 +49,11 @@ public class CsvSourceManager {
                 log.error(e.getMessage(), e);
 
             }
+
         } else {
 
+//            String foundMd5 = getMd5OfFileContents(waterMarkFile);
+//            log.info("Found md5: {}", foundMd5);
             this.indexingRequired = false;
         }
     }

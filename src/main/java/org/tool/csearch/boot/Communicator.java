@@ -17,6 +17,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
+import org.tool.csearch.log.Logger;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,10 +33,17 @@ public class Communicator {
             String cmd;
             while (!((cmd = next()).toLowerCase().equals("exit"))) {
 
+                if (cmd.trim().length() < 1) {
+                    continue;
+                }
+
                 try {
 
-                    Query query = new QueryParser("title", new StandardAnalyzer()).parse(cmd);
-                    TopDocs topDocs = searcher.search(query, 100);
+                    int maxDocs = 100;
+                    Query query = new QueryParser(headers.get(0), new StandardAnalyzer()).parse(cmd);
+                    Logger.debug(query.toString());
+                    TopDocs topDocs = searcher.search(query, maxDocs);
+                    Logger.debug("Query done");
 
                     for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 
@@ -50,9 +58,10 @@ public class Communicator {
 
                         }
 
-                        log.info(StringUtils.join(values, ","));
-
+                        Logger.log(StringUtils.join(values, ","));
                     }
+
+                    Logger.log(String.format("Total Hits: %d, Showing: %d", topDocs.totalHits, Math.min(topDocs.totalHits, maxDocs)));
 
                 } catch (ParseException e) {
 
