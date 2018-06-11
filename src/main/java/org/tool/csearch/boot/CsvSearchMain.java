@@ -20,11 +20,13 @@ public class CsvSearchMain {
 
     public static void main(String[] argsv) throws Exception {
 
+        //TODO:
+        //1. table -> simple transition.
+        //2. filter necessary logging.
+
+        Logger.debug = false;
+
         AppConfig appConfig = new AppConfig(argsv);
-        /*
-         * TODO:
-         * 1. Fix logging.
-         */
 
         CsvColumnAnalyzer csvColumnAnalyzer = new CsvColumnAnalyzer();
         csvColumnAnalyzer.compile(appConfig.getInputCsvFilePath(), appConfig.getColumnExpression());
@@ -42,6 +44,9 @@ public class CsvSearchMain {
             Logger.info(String.format("Reusing existing index: %s", csvSourceManager.getDropPath()));
         }
 
+        if (csvColumnAnalyzer.getSelectedColumnNames() == null) {
+            throw new RuntimeException("IS NULL");
+        }
         IFormatter formatter = new FormatterFactory().getFormatter(appConfig.getFormatterName());
         IndexSearchDelegator searchDelegator = new IndexSearchDelegator();
         searchDelegator.search(appConfig.getLuceneQuery(),

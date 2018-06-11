@@ -22,7 +22,7 @@ public class CsvColumnAnalyzer {
 
     private List<Integer> selectedColumnIndexes;
 
-    private List<String> selectedColumnNames;
+    private List<String> selectedColumnNames = new ArrayList<String>();
 
     public void compile(Path filePath, String columnExpression) {
         List<String> columnNamesInCsvFile = Arrays.asList(getColumnNamesOfCsv(filePath));
@@ -36,6 +36,10 @@ public class CsvColumnAnalyzer {
                     .map(i -> columnNamesInCsvFile.indexOf(i))
                     .collect(Collectors.toList());
 
+            this.selectedColumnIndexes.forEach(index -> {
+                this.selectedColumnNames.add(this.columnNames.get(index));
+            });
+
             return;
         }
 
@@ -44,17 +48,17 @@ public class CsvColumnAnalyzer {
                 .filter(a -> !a.isEmpty())
                 .collect(Collectors.toList());
 
-        List<Integer> integerExpressions = columnExpressions.stream()
-                .filter(a -> safeParseInteger(a).isPresent())
-                .map(b -> Integer.parseInt(b))
-                .collect(Collectors.toList());
-
-        //If all of the expressions are column indexes, then simply return the indexes;
-        if (integerExpressions.size() == columnExpressions.size()) {
-
-            this.selectedColumnIndexes = integerExpressions;
-            return;
-        }
+//        List<Integer> integerExpressions = columnExpressions.stream()
+//                .filter(a -> safeParseInteger(a).isPresent())
+//                .map(b -> Integer.parseInt(b))
+//                .collect(Collectors.toList());
+//
+//        //If all of the expressions are column indexes, then simply return the indexes;
+//        if (integerExpressions.size() == columnExpressions.size()) {
+//
+//            this.selectedColumnIndexes = integerExpressions;
+//            return;
+//        }
 
         List<Integer> finalColumns = new ArrayList<Integer>();
         columnExpressions.forEach(expression -> {
@@ -76,11 +80,10 @@ public class CsvColumnAnalyzer {
             sb.append(",");
         });
 
-        System.out.println("Selected columns: " + sb.toString());
-        System.out.println("Final Columns: " + finalColumns.toString());
+        Logger.debug("Selected columns: " + sb.toString());
+        Logger.debug("Final Columns: " + finalColumns.toString());
 
         this.selectedColumnIndexes = finalColumns;
-        this.selectedColumnNames = new ArrayList<String>();
 
         this.selectedColumnIndexes.forEach(index -> {
             this.selectedColumnNames.add(this.columnNames.get(index));
