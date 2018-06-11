@@ -8,7 +8,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.tool.csearch.log.Logger;
 
-public class DefaultFormatter implements IFormatter {
+public class DetailedFormatter implements IFormatter {
 
     @Override
     public void printDoc(Document document, List<String> headers) {

@@ -21,12 +21,12 @@ public class CsvSearchMain {
     public static void main(String[] argsv) throws Exception {
 
         //TODO:
-        //1. table -> simple transition.
         //2. filter necessary logging.
+        //3. Summary details: num rows/total rows/time taken.. -1\n +1\n
 
-        Logger.debug = false;
-
+        Timer opTimer = new Timer();
         AppConfig appConfig = new AppConfig(argsv);
+        Logger.debug = appConfig.getDebug();
 
         CsvColumnAnalyzer csvColumnAnalyzer = new CsvColumnAnalyzer();
         csvColumnAnalyzer.compile(appConfig.getInputCsvFilePath(), appConfig.getColumnExpression());
@@ -49,11 +49,13 @@ public class CsvSearchMain {
         }
         IFormatter formatter = new FormatterFactory().getFormatter(appConfig.getFormatterName());
         IndexSearchDelegator searchDelegator = new IndexSearchDelegator();
-        searchDelegator.search(appConfig.getLuceneQuery(),
+        Integer totalHits = searchDelegator.search(appConfig.getLuceneQuery(),
                 csvSourceManager.getDropPath(),
                 formatter,
                 csvColumnAnalyzer.getSelectedColumnNames(),
                 appConfig.getLimit());
+
+        Logger.info(String.format("\nTotal Hits: %d Limit: %d: Time taken: %s", totalHits, appConfig.getLimit(), opTimer.end().toString()));
     }
 
     public static List<String> getColumnNamesOfCsv(Path path) {

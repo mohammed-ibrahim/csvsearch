@@ -18,11 +18,13 @@ import org.tool.csearch.log.Logger;
 
 public class IndexSearchDelegator {
 
-    public void search(String luceneQuery,
+    public Integer search(String luceneQuery,
             Path path,
             IFormatter formatter,
             List<String> headers,
             int limit) throws Exception {
+
+        Integer totalHits = 0;
 
         try (IndexReader reader = DirectoryReader.open(FSDirectory.open(path))) {
             IndexSearcher searcher = new IndexSearcher(reader);
@@ -33,6 +35,7 @@ public class IndexSearchDelegator {
             TopDocs topDocs = searcher.search(query, limit);
             Logger.debug(String.format("Time taken to perform query: %s", searchTimer.end().toString()));
 
+            totalHits = topDocs.totalHits;
             Timer fetchTimer = new Timer();
             for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 
@@ -41,5 +44,7 @@ public class IndexSearchDelegator {
 
             Logger.debug(String.format("Time taken to perform fetch: %s", fetchTimer.end().toString()));
         }
+
+        return totalHits;
     }
 }

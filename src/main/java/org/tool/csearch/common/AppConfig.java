@@ -22,11 +22,13 @@ public class AppConfig {
 
     private int limit;
 
+    private Boolean debug;
+
     public AppConfig(String[] args) {
         if (args.length < 2) {
 
-            //usage: java -jar cs.jar inputcsv.csv lucene_query [list_of_columns] [table|vtable|simple]
-            throw new RuntimeException("usage: java -jar cs.jar inputcsv.csv lucene_query [list_of_columns] [table|vtable|simple] [limit]");
+            //usage: java -jar cs.jar inputcsv.csv lucene_query [list_of_columns] [simple|detailed] [limit] [debug]
+            throw new RuntimeException("usage: java -jar cs.jar inputcsv.csv lucene_query [list_of_columns] [simple|detailed] [limit] [true,yes,t,y,1 (i.e. debug logs)]");
         }
 
         this.inputCsvFilePath = Paths.get(args[0]);
@@ -37,8 +39,9 @@ public class AppConfig {
 
         //Formatter
         this.formatterName = "simple";
+
         if (args.length > 3) {
-            List<String> allowedFormatters = Arrays.asList("table", "vtable", "simple");
+            List<String> allowedFormatters = Arrays.asList("simple", "detailed");
 
             String requestedFormat = args[3];
             if (!allowedFormatters.contains(requestedFormat)) {
@@ -57,6 +60,19 @@ public class AppConfig {
         } else {
 
             this.limit = Constants.DEFAULT_RESULT_LIMIT;
+        }
+
+        this.debug = false;
+        //Debug
+        if (args.length > 5) {
+
+            String value = args[5].toLowerCase();
+            List<String> trueValues = Arrays.asList("true", "yes", "t", "y", "1");
+
+            if (trueValues.contains(value)) {
+
+                this.debug = true;
+            }
         }
     }
 }

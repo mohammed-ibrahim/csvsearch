@@ -1,6 +1,6 @@
 package org.tool.csearch.factory;
 
-import org.tool.csearch.formatter.DefaultFormatter;
+import org.tool.csearch.formatter.DetailedFormatter;
 import org.tool.csearch.formatter.IFormatter;
 import org.tool.csearch.formatter.TableFormatter;
 
@@ -11,11 +11,11 @@ public class FormatterFactory {
         name = name.toLowerCase();
 
         if ("simple".equals(name)) {
-            return new DefaultFormatter();
+            return new TableFormatter();
         }
 
-        if ("table".equals(name)) {
-            return new TableFormatter();
+        if ("detailed".equals(name)) {
+            return new DetailedFormatter();
         }
 
         throw new RuntimeException("Formatter not configured: " + name);
