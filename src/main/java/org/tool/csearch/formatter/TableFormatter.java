@@ -25,7 +25,7 @@ public class TableFormatter implements IFormatter {
             }
         }
 
-        Logger.log(StringUtils.join(values, ","));
+        Logger.info(StringUtils.join(values, ","));
     }
 
     @Override

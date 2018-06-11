@@ -4,17 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.tool.csearch.common.Constants;
 import org.tool.csearch.common.Timer;
+import org.tool.csearch.log.Logger;
 
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Data
 public class CsvSourceManager {
 
@@ -36,8 +34,6 @@ public class CsvSourceManager {
 
         Path waterMarkFile = Paths.get(dropPath.toString(), Constants.WATER_MARK_FILE);
 
-        Timer t2 = new Timer();
-
         if (!waterMarkFile.toFile().isFile()
                 || !Constants.WATER_MARK_FILE_EXPECTED_MD5.equals(getMd5OfFileContents(waterMarkFile))) {
 
@@ -51,7 +47,7 @@ public class CsvSourceManager {
 
             } catch (Exception e) {
 
-                log.error(e.getMessage(), e);
+                Logger.info(e.getMessage() + " " + e);
 
             }
 
@@ -59,8 +55,6 @@ public class CsvSourceManager {
 
             this.indexingRequired = false;
         }
-
-        log.info("T2 block timer: {}", t2.end().toString());
     }
 
     private String getMd5OfFileContents(Path filePath) throws Exception {
@@ -74,7 +68,7 @@ public class CsvSourceManager {
 
         }
 
-        log.info("Time taken to compute hash: {}", timer.end().toString());
+        Logger.debug(String.format("Time taken to compute hash: %s", timer.end().toString()));
         return md5;
     }
 
@@ -88,13 +82,13 @@ public class CsvSourceManager {
                 return true;
             }
 
-//            InetAddress addr = InetAddress.getLocalHost();
-//            String hostname = addr.getHostName();
-//            String hostname = getComputerName();
-//            if (hostname.toLowerCase().indexOf("macbook") > -1) {
-//
-//                return true;
-//            }
+            // InetAddress addr = InetAddress.getLocalHost();
+            // String hostname = addr.getHostName();
+            // String hostname = getComputerName();
+            // if (hostname.toLowerCase().indexOf("macbook") > -1) {
+            //
+            // return true;
+            // }
 
         } catch (Exception e) {
 

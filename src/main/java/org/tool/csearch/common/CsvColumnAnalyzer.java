@@ -10,11 +10,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.tool.csearch.log.Logger;
+
 import au.com.bytecode.opencsv.CSVReader;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Data
 public class CsvColumnAnalyzer {
 
@@ -99,7 +99,7 @@ public class CsvColumnAnalyzer {
 
             if (matchingColumnsIndexes.size() < 1) {
 
-                log.info("Expression: {} didn't match any column.", expression);
+                Logger.error(String.format("Expression: %s didn't match any column.", expression));
                 return null;
             }
 
@@ -111,7 +111,7 @@ public class CsvColumnAnalyzer {
                 return Arrays.asList(columnNamesInCsvFile.indexOf(expression));
             }
 
-            log.info("Column: {} not found in csv.", expression);
+            Logger.debug(String.format("Column: %s not found in csv.", expression));
             return null;
         }
     }

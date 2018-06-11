@@ -58,10 +58,10 @@ public class Communicator {
 
                         }
 
-                        Logger.log(StringUtils.join(values, ","));
+                        Logger.info(StringUtils.join(values, ","));
                     }
 
-                    Logger.log(String.format("Total Hits: %d, Showing: %d", topDocs.totalHits, Math.min(topDocs.totalHits, maxDocs)));
+                    Logger.info(String.format("Total Hits: %d, Showing: %d", topDocs.totalHits, Math.min(topDocs.totalHits, maxDocs)));
 
                 } catch (ParseException e) {
 

@@ -25,7 +25,7 @@ public class DefaultFormatter implements IFormatter {
             }
         }
 
-        Logger.log(StringUtils.join(values, ","));
+        Logger.info(StringUtils.join(values, ","));
     }
 
     @Override

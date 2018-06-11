@@ -21,12 +21,11 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.FSDirectory;
 import org.tool.csearch.common.Constants;
 import org.tool.csearch.common.Timer;
+import org.tool.csearch.log.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Data
 public class Indexer {
 
@@ -38,7 +37,7 @@ public class Indexer {
 
     private Path index(Path filePath, Path dropPath) throws Exception {
 
-        log.info("Indexing........");
+        Logger.info("Indexing........");
         Timer timer = new Timer();
 
         FSDirectory indexDir = FSDirectory.open(dropPath);
@@ -72,14 +71,14 @@ public class Indexer {
                 numDocuments++;
                 
                 if (numDocuments > 0 && numDocuments % 500 == 0) {
-                    log.info("Added document: {}", numDocuments);
+                    Logger.info(String.format("Added documents: %s", numDocuments));
                 }
             }
 
             Path waterMarkFile = Paths.get(dropPath.toString(), Constants.WATER_MARK_FILE);
             Files.write(waterMarkFile, Arrays.asList(Constants.WATER_MARK_FILE_CONTENT), Charset.forName("UTF-8"));
 
-            log.info("Documents indexed: {} Time taken: {}, location: {}", numDocuments, timer.end().toString(), dropPath);
+            Logger.info(String.format("Documents indexed: %d Time taken: %s, location: %s", numDocuments, timer.end().toString(), dropPath));
             return dropPath;
         }
     }
