@@ -23,19 +23,17 @@ public class CsvSourceManager {
     public CsvSourceManager(Path filePath) throws Exception {
         this.indexingRequired = true;
 
-        String md5File = getMd5OfFileContents(filePath);
-
-        String md5Name = DigestUtils.md5Hex(filePath.toAbsolutePath().toString());
+        String fileKey = String.format("%s-%d", filePath.toAbsolutePath().toString(), filePath.toFile().lastModified());
+        String md5Name = DigestUtils.md5Hex(fileKey);
 
         String baseDir = "";
 
         baseDir = isLocalMachine() ? "/tmp" : System.getProperty("java.io.tmpdir");
-        dropPath = Paths.get(baseDir, "csvsearch", md5Name, md5File);
+        dropPath = Paths.get(baseDir, "csvsearch", md5Name);
 
         Path waterMarkFile = Paths.get(dropPath.toString(), Constants.WATER_MARK_FILE);
 
-        if (!waterMarkFile.toFile().isFile()
-                || !Constants.WATER_MARK_FILE_EXPECTED_MD5.equals(getMd5OfFileContents(waterMarkFile))) {
+        if (!waterMarkFile.toFile().isFile()) {
 
             try {
 
