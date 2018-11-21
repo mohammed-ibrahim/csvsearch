@@ -29,3 +29,6 @@ Search large csv files with lucene.
 ## Features
 - Scalable, can index csv with millions of rows.
 - Full lucene query support.
+
+## Links
+- Lucene Query Syntax http://www.lucenetutorial.com/lucene-query-syntax.html
