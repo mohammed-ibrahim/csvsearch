@@ -12,7 +12,7 @@ public class Parallel implements IParallelTarget<Integer, String> {
 
         Parallel p = new Parallel();
         List<Integer> input = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8);
-        Parallelizer<Integer, String> pz  = new Parallelizer<Integer, String>(p, input.iterator(), 4, true);
+        Parallelizer<Integer, String> pz  = new Parallelizer<Integer, String>(p, input.iterator(), 4, false);
         pz.start();
         log.info("<<<<<<<<<<<<Completed>>>>>>>>>>>>");
     }
