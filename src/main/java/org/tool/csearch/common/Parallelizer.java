@@ -1,5 +1,7 @@
 package org.tool.csearch.common;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,11 +22,15 @@ public class Parallelizer<M, N> {
     private Boolean exitIfEvenOneRecordFails;
 
     //Following args to be used internally.
-    private boolean hasFailed;
+    private boolean fatalError;
 
-    private ExecutorService executorService;
+    private String failureMessage;
+
+    private Integer numSuccessfulRecords;
 
     private Integer numFailedRecords;
+
+    private ExecutorService executorService;
 
     public Parallelizer(
         IParallelTarget<M, N> target1,
@@ -37,11 +43,13 @@ public class Parallelizer<M, N> {
         this.numberOfParallelTasks = numberOfParallelTasks1;
         this.exitIfEvenOneRecordFails = exitOnFailure1;
 
-        this.hasFailed = false;
+        this.fatalError = false;
+        this.failureMessage = null;
+        this.numSuccessfulRecords = 0;
         this.numFailedRecords = 0;
     }
 
-    public void start() throws Exception {
+    public ExecutionResponse start() throws Exception {
         this.executorService = Executors.newFixedThreadPool(this.numberOfParallelTasks);
 
         for (int i = 0; i < this.numberOfParallelTasks; i++) {
@@ -50,11 +58,13 @@ public class Parallelizer<M, N> {
 
         this.executorService.shutdown();
         this.executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+
+        return new ExecutionResponse(!this.fatalError, this.failureMessage, this.numSuccessfulRecords, this.numFailedRecords);
     }
 
     synchronized M getNextRecord() {
 
-        if (this.hasFailed) {
+        if (this.fatalError) {
 
             return null;
         }
@@ -64,14 +74,27 @@ public class Parallelizer<M, N> {
             return null;
         }
 
-        if (this.iterator.hasNext()) {
+
+        boolean hasNext = false;
+
+        try {
+
+            hasNext = this.iterator.hasNext();
+        } catch (Exception e) {
+
+            String message = String.format("%s.hasNext() has failed with error: %s", this.iterator.getClass(), exceptionToString(e));
+            this.onFatalError(message);
+        }
+
+        if (hasNext) {
 
             try {
 
                 return this.iterator.next();
             } catch (Exception e) {
 
-                this.onFailure();
+                String message = String.format("%s.next() has failed with error: %s", this.iterator.getClass(), exceptionToString(e));
+                this.onFatalError(message);
             }
 
         }
@@ -83,10 +106,12 @@ public class Parallelizer<M, N> {
         try {
 
             this.target.onSuccess(m, n);
+            this.numSuccessfulRecords++;
 
         } catch (Exception e) {
 
-            this.onFailure();
+            String message = String.format("%s.onSuccess(...) has failed with error: %s", this.target.getClass(), exceptionToString(e));
+            this.onFatalError(message);
         }
     }
 
@@ -95,19 +120,32 @@ public class Parallelizer<M, N> {
 
             this.numFailedRecords++;
             this.target.onFailure(m, t);
+
         } catch (Exception e) {
 
-            this.onFailure();
+            String message = String.format("%s.onFailure(...) has failed with error: %s", this.target.getClass(), exceptionToString(e));
+            this.onFatalError(message);
         }
     }
 
-    synchronized void onFailure() {
+    synchronized void onFatalError(String message) {
 
-        this.hasFailed = true;
+        this.fatalError = true;
+        this.failureMessage = message;
+
     }
 
     private N executeRecord(M m) throws Exception {
+
         return this.target.execute(m);
+    }
+
+    private String exceptionToString(Exception exception) {
+
+        StringWriter stringWriter = new StringWriter();
+        exception.printStackTrace(new PrintWriter(stringWriter));
+
+        return stringWriter.toString();
     }
 
     private class TaskHandler implements Runnable {

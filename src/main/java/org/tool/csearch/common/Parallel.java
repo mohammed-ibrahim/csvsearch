@@ -12,9 +12,9 @@ public class Parallel implements IParallelTarget<Integer, String> {
 
         Parallel p = new Parallel();
         List<Integer> input = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8);
-        Parallelizer<Integer, String> pz  = new Parallelizer<Integer, String>(p, input.iterator(), 4, false);
-        pz.start();
-        log.info("<<<<<<<<<<<<Completed>>>>>>>>>>>>");
+        Parallelizer<Integer, String> pz  = new Parallelizer<Integer, String>(p, new TestIterator(), 4, false);
+        ExecutionResponse resp = pz.start();
+        log.info("<<<<<<<<<<<<Completed>>>>>>>>>>>> :::: {}", resp.toString());
     }
 
     @Override
@@ -23,20 +23,20 @@ public class Parallel implements IParallelTarget<Integer, String> {
         if (q % 2 == 0) {
             throw new RuntimeException("even message");
         }
+
         Thread.currentThread().sleep(3000);
         return q.toString();
     }
 
     @Override
     public void onSuccess(Integer q, String s) {
-
-        log.info("Completed: {} ::: {}", q, s);
+//        throw new RuntimeException("onSuccess message");
     }
 
     @Override
     public void onFailure(Integer q, Throwable t) {
 
-        log.info("Failed: {} ::: {}", q, t);
+//        throw new RuntimeException("onSuccess message");
 
     }
 }
