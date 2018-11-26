@@ -29,7 +29,7 @@ def generate_key(row, headers, join_columns):
             raise Exception("Empty header value specified!!")
 
         if column not in headers:
-            raise Exception("Header: % not found in csv." % column)
+            raise Exception("Header: %s not found in csv." % column)
 
         index = headers.index(column)
         values.append(row[index])
