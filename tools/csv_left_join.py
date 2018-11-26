@@ -17,8 +17,26 @@ log = logging.getLogger(__name__)
 # 3. load second_csv
 # 4. join those csv
 
+def generate_key(row, headers, join_columns):
 
-def load_csv_as_keyvp(csv_file_name, mapping_column_name):
+    if len(join_columns) < 1:
+        raise Exception("Atleast one header has to be specified")
+
+    values = []
+
+    for column in join_columns:
+        if "" == column.strip():
+            raise Exception("Empty header value specified!!")
+
+        if column not in headers:
+            raise Exception("Header: % not found in csv." % column)
+
+        index = headers.index(column)
+        values.append(row[index])
+
+    return "_a_".join(values)
+
+def load_csv_as_keyvp(csv_file_name, join_columns):
     content = {}
     total_rows = 0
 
@@ -33,8 +51,8 @@ def load_csv_as_keyvp(csv_file_name, mapping_column_name):
             if headers is None:
                 headers = list(row)
             else:
-                key_value = row[headers.index(mapping_column_name)]
-                content[key_value] = list(row)
+                composite_key = generate_key(row, headers, join_columns)
+                content[composite_key] = list(row)
 
     log.info("Total number of rows loaded from file: %s are: %d", csv_file_name, total_rows)
 
@@ -92,7 +110,7 @@ if __name__ == "__main__":
 
     first_file = sys.argv[1]
     second_file = sys.argv[2]
-    join_columns = sys.argv[3]
+    join_columns = sys.argv[3].split(",")
 
     resultant_file_name = "%s-resultant-merged.csv" % str(uuid.uuid4())
 
